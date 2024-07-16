@@ -5,6 +5,10 @@
 *.tfstate
 *.tfstate.*
 
+# Ignore .terraform directory
+.terraform/
+.terraform.lock.hcl
+
 # Crash log files
 crash.log
 crash.*.log
@@ -32,3 +36,29 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore any generated files or directories
+*.tfvars
+*.tfvars.json
+*.tfvars.tf
+*.tfvars.tf.json
+*.tfplan
+
+# Ignore sensitive or private information
+*.pem
+*.key
+*.pub
+*.cer
+*.crt
+*.csr
+*.pfx
+*.p12
+*.pem
+*.env
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
