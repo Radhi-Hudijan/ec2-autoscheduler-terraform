@@ -12,14 +12,34 @@ def lambda_handler(event, context):
         table = dynamodb.Table(table_name)
         for tag in tags:
             if tag['key'] in ['auto:stop', 'auto:start']:
-                table.put_item(
-                    Item={
+                # check if the tag is already present in the table
+                response = table.get_item(
+                    Key={
                         'instance_id': instance_id,
-                        'tag_key': tag['key'],
-                        'tag_value': tag['value']
+                        'tag_key': tag['key']
                     }
                 )
-
+                if 'Item' in response:
+                    # update the tag value
+                    table.update_item(
+                        Key={
+                            'instance_id': instance_id,
+                            'tag_key': tag['key']
+                        },
+                        UpdateExpression='SET tag_value = :val',
+                        ExpressionAttributeValues={
+                            ':val': tag['value']
+                        }
+                    )
+                else:
+                    # add the tag to the table  
+                    table.put_item(
+                        Item={
+                            'instance_id': instance_id,
+                            'tag_key': tag['key'],
+                            'tag_value': tag['value']
+                        }
+                    )
     except Exception as e:
         print(f'Error: {e}')
         return {
