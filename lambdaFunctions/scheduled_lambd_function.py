@@ -13,10 +13,22 @@ def lambda_handler(event, context):
     response = table.scan()
     items = response['Items']
 
-    current_time = datetime.datetime.now().strftime("%H:%M")
+    current_time = datetime.datetime.now()
+    current_time_str = current_time.strftime('%H:%M')
+    print(f"Current time: {current_time_str}")
     
     #check if the current time matches the time in the tags
     for item in items:
+        instance_id=item['instance_id']
+        tag_key=item['tag_key']
+        tag_value=item['tag_value']
+
+        #convert the tag value to datetime object
+        tag_time = datetime.datetime.strptime(tag_value, '%H:%M')
+        tag_time = tag_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
+
+        #check if the current time matches the tag time 
+
         if item['tag_key'] == 'auto:stop' and item['tag_value'] == current_time:
             instance_id = item['instance_id']
             ec2.stop_instances(InstanceIds=[instance_id])
