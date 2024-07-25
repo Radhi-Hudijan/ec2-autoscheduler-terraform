@@ -4,6 +4,8 @@ import boto3
 import pytz
 
 def lambda_handler(event, context):
+    print("Lambda function started")  # Added debug statement
+
     #get the service resource
     dynamodb = boto3.resource('dynamodb')
     ec2 = boto3.client('ec2')
@@ -11,25 +13,26 @@ def lambda_handler(event, context):
     table_name = 'ec2_instance_tags'
     table = dynamodb.Table(table_name)
 
+
     response = table.scan()
     items = response['Items']
+    print(f"Scanned items: {items}")  # Added debug statement
 
-    #get the current time
-    # current_time = datetime.datetime.now()
-    # current_time_str = current_time.strftime('%H:%M')
-    # print(f"Current time: {current_time_str}")
-    
+
     #check if the current time matches the time in the tags
     for item in items:
         instance_id=item['instance_id']
         tag_key=item['tag_key']
         tag_value=item['tag_value']
+        
 
         try:
-            # Get the instance region and timezone
+            #Get the instance region and timezone
             instance = ec2.describe_instances(InstanceIds=[instance_id])
             region = instance['Reservations'][0]['Instances'][0]['Placement']['AvailabilityZone'][:-1]
+            
             timezone = pytz.timezone(get_timezone(region))
+            print(f"timezon is :{timezone}")
             
             # Get the current time in the instance's region
             current_time = datetime.datetime.now(timezone)
@@ -37,9 +40,11 @@ def lambda_handler(event, context):
             print(f"Current time in region {region} =", current_time_str)
 
 
-            #convert the tag value to datetime object
+            # convert the tag value to datetime object
             tag_time = datetime.datetime.strptime(tag_value, '%H:%M')
-            tag_time = tag_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
+            
+            # convert the tag time to timezone-aware datetime object
+            tag_time = timezone.localize(tag_time.replace(year=current_time.year, month=current_time.month, day=current_time.day))
             print(f"{tag_key} time of instance {instance_id}: {tag_time}")
 
             #check if the tag time has passed
@@ -68,10 +73,9 @@ def lambda_handler(event, context):
         except Exception as e:
             print(f"Error processing instance {instance_id}: {e}")
             return {
-                      'statusCode': 500,
-                      'body': json.dumps('Internal Server Error')
-                      }
-
+                'statusCode': 500,
+                'body': json.dumps('Internal Server Error')
+            }
 
 def get_timezone(region):
     # A mapping of AWS regions to their respective timezones
@@ -86,5 +90,4 @@ def get_timezone(region):
         'eu-west-3': 'Europe/Paris',
         'eu-north-1': 'Europe/Helsinki',
     }
-    return region_timezones.get(region, 'UTC')  # Default to UTC if region is not found
-       
+    return region_timezones.get(region, 'UTC')
