@@ -93,3 +93,38 @@ resource "aws_iam_role_policy_attachment" "lambda_exec" {
   policy_arn = aws_iam_policy.lambda_exec.arn
   role       = aws_iam_role.lambda_exec.name
 }
+
+
+# create the Time Triggered Lambda
+
+# Create a zip file for the lambda function
+data "archive_file" "time_triggered_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambdaFunctions/scheduled_lambd_function.py"
+  output_path = "${path.module}/lambdaFunctions/scheduled_lambd_function.zip"
+}
+
+# Create an S3 bucket for the lambda function
+resource "aws_s3_object" "time_triggered_lambda_bucket" {
+  bucket = "lambda-bucket-${var.environment}"
+  key    = "scheduled_lambd_function.zip"
+  source = data.archive_file.time_triggered_lambda.output_path
+}
+
+# Create a lambda function
+resource "aws_lambda_function" "time_triggered_lambda" {
+  filename      = data.archive_file.time_triggered_lambda.output_path
+  function_name = "scheduled_lambda"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "scheduled_lambd_function.lambda_handler"
+  runtime       = "python3.7"
+  timeout       = 30
+  memory_size   = 128
+}
+
+# Create a log group for the lambda function
+resource "aws_cloudwatch_log_group" "time_triggered_lambda" {
+  name              = "/aws/lambda/scheduled_lambda"
+  retention_in_days = 7
+
+}
