@@ -8,16 +8,17 @@ data "archive_file" "tags_extractor_lambda" {
 }
 
 # Create an S3 bucket for the lambda function
-resource "aws_s3_object" "lambda_bucket" {
-  bucket = "lambda-bucket-${var.environment}"
+resource "aws_s3_object" "tag_lambda_bucket" {
+  bucket = aws_s3_bucket.lambda_deployment_bucket.bucket
   key    = "tags_extractor.zip"
   source = data.archive_file.tags_extractor_lambda.output_path
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "tags_extractor" {
-  filename      = data.archive_file.tags_extractor_lambda.output_path
   function_name = "tags_extractor"
+  s3_bucket     = aws_s3_bucket.lambda_deployment_bucket.bucket
+  s3_key        = aws_s3_object.tag_lambda_bucket.key
   role          = aws_iam_role.lambda_exec.arn
   handler       = "tags_extractor.lambda_handler"
   runtime       = "python3.7"
@@ -106,15 +107,16 @@ data "archive_file" "time_triggered_lambda" {
 
 # Create an S3 bucket for the lambda function
 resource "aws_s3_object" "time_triggered_lambda_bucket" {
-  bucket = "lambda-bucket-${var.environment}"
+  bucket = aws_s3_bucket.lambda_deployment_bucket.bucket
   key    = "scheduled_lambd_function.zip"
   source = data.archive_file.time_triggered_lambda.output_path
 }
 
 # Create a lambda function
 resource "aws_lambda_function" "time_triggered_lambda" {
-  filename      = data.archive_file.time_triggered_lambda.output_path
   function_name = "scheduled_lambda"
+  s3_bucket     = aws_s3_bucket.lambda_deployment_bucket.bucket
+  s3_key        = aws_s3_object.time_triggered_lambda_bucket.key
   role          = aws_iam_role.lambda_exec.arn
   handler       = "scheduled_lambd_function.lambda_handler"
   runtime       = "python3.7"

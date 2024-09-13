@@ -8,3 +8,8 @@ variable "environment" {
   description = "The environment in which the resources will be created."
   default     = "dev"
 }
+
+variable "account_id" {
+  description = "The account ID in which the resources will be created."
+  default     = "533267081597"
+}
