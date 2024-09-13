@@ -13,3 +13,8 @@ variable "account_id" {
   description = "The account ID in which the resources will be created."
   default     = "533267081597"
 }
+
+variable "dynamodb_table_name" {
+  description = "The name of the DynamoDB table."
+  default     = "ec2_instance_tags"
+}

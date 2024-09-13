@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "lambda_policy" {
       "dynamodb:Scan",
       "dynamodb:Query"
     ]
-    resources = ["arn:aws:dynamodb:${var.region}:${var.account_id}:table/ec2_instance_tags"]
+    resources = ["arn:aws:dynamodb:${var.region}:${var.account_id}:table/${var.dynamodb_table_name}"]
   }
 
   statement {
