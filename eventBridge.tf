@@ -2,9 +2,9 @@
 
 #Rule to listen to tag changes and trigger the tags_extractor lambda function
 resource "aws_cloudwatch_event_rule" "tag_change_rule" {
-  name        = "tag_change_rule"
-  description = "Rule to listen to tag changes and trigger the tags_extractor lambda function"
-  event_pattern = jsondecode(
+  name          = "tag_change_rule"
+  description   = "Rule to listen to tag changes and trigger the tags_extractor lambda function"
+  event_pattern = <<EOF
     {
 
       "source" : ["aws.ec2"],
@@ -12,10 +12,11 @@ resource "aws_cloudwatch_event_rule" "tag_change_rule" {
       "detail" : {
         "eventSource" : ["ec2.amazonaws.com"],
         "eventName" : ["CreateTags", "ModifyTags"]
-      }
+    }
 
     }
-  )
+    EOF
+
 }
 
 # Create a target for the EventBridge rule

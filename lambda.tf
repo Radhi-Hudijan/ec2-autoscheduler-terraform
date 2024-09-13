@@ -3,7 +3,7 @@
 # Create a zip file for the lambda function
 data "archive_file" "tags_extractor_lambda" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdaFunctions/tags_extractor.py"
+  source_file = "${path.module}/lambdaFunctions/tags_extractor.py"
   output_path = "${path.module}/lambdaFunctions/tags_extractor.zip"
 }
 
@@ -57,7 +57,9 @@ data "aws_iam_policy_document" "lambda_policy" {
   statement {
     actions = [
       "ec2:DescribeTags",
-      "ec2:DescribeInstances"
+      "ec2:DescribeInstances",
+      "ec2:StartInstances",
+      "ec2:StopInstances"
     ]
     resources = ["*"]
   }
@@ -101,7 +103,7 @@ resource "aws_iam_role_policy_attachment" "lambda_exec" {
 # Create a zip file for the lambda function
 data "archive_file" "time_triggered_lambda" {
   type        = "zip"
-  source_dir  = "${path.module}/lambdaFunctions/scheduled_lambd_function.py"
+  source_file = "${path.module}/lambdaFunctions/scheduled_lambd_function.py"
   output_path = "${path.module}/lambdaFunctions/scheduled_lambd_function.zip"
 }
 
