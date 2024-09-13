@@ -1,4 +1,4 @@
-# ec2-autoscheduler-terraform
+# Ec2-autoscheduler-terraform
 
 ## Introduction
 
