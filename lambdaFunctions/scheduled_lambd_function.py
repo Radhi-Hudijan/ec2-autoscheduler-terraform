@@ -1,7 +1,7 @@
 import datetime
 import json
 import boto3  
-
+from boto3.dynamodb.conditions import Attr
 
 def lambda_handler(event, context):
     print("Lambda function started")  # Added debug statement
