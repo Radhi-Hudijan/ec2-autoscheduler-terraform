@@ -21,7 +21,7 @@ resource "aws_lambda_function" "tags_extractor" {
   s3_key        = aws_s3_object.tag_lambda_bucket.key
   role          = aws_iam_role.lambda_exec.arn
   handler       = "tags_extractor.lambda_handler"
-  runtime       = "python3.7"
+  runtime       = "python3.12"
   timeout       = 30
   memory_size   = 128
 }
@@ -121,7 +121,7 @@ resource "aws_lambda_function" "time_triggered_lambda" {
   s3_key        = aws_s3_object.time_triggered_lambda_bucket.key
   role          = aws_iam_role.lambda_exec.arn
   handler       = "scheduled_lambd_function.lambda_handler"
-  runtime       = "python3.7"
+  runtime       = "python3.12"
   timeout       = 30
   memory_size   = 128
 }
